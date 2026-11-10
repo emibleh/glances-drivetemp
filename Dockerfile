@@ -1,9 +1,12 @@
-FROM python:3.12-alpine
+# Build
+FROM alpine:3.20 AS build
+RUN apk add --no-cache g++ musl-dev make
+WORKDIR /src
+RUN g++ -02 -static -o hddtemp_server hddtemp_server.cpp
 
+# Runtime
+FROM alpine:3.20
 RUN apk add --no-cache smartmontools
-
-COPY hddtemp_server.py /hddtemp_server.py
-
+COPY --from=build /src/hddtemp_server /hddtemp_server
 EXPOSE 7634
-
-CMD ["python3", "/hddtemp_server.py"]
+CMD ["/hddtemp_server"]
