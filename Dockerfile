@@ -2,6 +2,7 @@
 FROM alpine:3.20 AS build
 RUN apk add --no-cache g++ musl-dev make
 WORKDIR /src
+COPY hddtemp_server.cpp hddtemp_server.h ./
 RUN g++ -O2 -static -o hddtemp_server hddtemp_server.cpp
 
 # Runtime
