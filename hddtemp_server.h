@@ -10,6 +10,10 @@
 
 struct Drive {
   std::string dir;
-  int temp;
+  int temp = -1;
 };
 
+struct Field {
+  std::string key;
+  int tk;
+};

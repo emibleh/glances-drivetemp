@@ -19,7 +19,14 @@ string readCommand(string cmd){
 	return data;
 }
 
-vector<string> getDrives(const string& smartOut) {
+const vector<Field> tempFields = {
+  {"Temperature_Celsius",     9}, // SATA/SAS
+  {"Airflow_Temperature_Cel", 9}, // SATA
+  {"Temperature:",            1}, // NVMe
+};
+
+// The following could be improved, it is quite verbose.
+vector<string> getDrives(const string& smartOut){
   vector<string> drives;
   istringstream iss(smartOut);
   string line;
@@ -31,21 +38,52 @@ vector<string> getDrives(const string& smartOut) {
   return drives;
 }
 
+vector<string> splitLines(const string& text){
+  vector<string> lines;
+  istringstream iss(text);
+  string line;
+  while (getline(iss, line)) lines.push_back(line);
+  return lines;
+}
+
+vector<string> splitWords(const string& line){
+  vector<string> words;
+  istringstream iss(line);
+  string w;
+  while (iss >> w) words.push_back(w);
+  return words;
+}
+
+bool getTemp(const vector<string>& lines, const vector<Field>& fields, int& out) {
+  for (const auto& f : fields) {
+    for (const auto& line : lines) {
+      if (line.find(f.key) == string::npos) continue;
+
+      vector<string> words = splitWords(line);
+      if ((int)words.size() <= f.tk) continue;
+
+      try {
+        out = stoi(words[f.tk]);
+        return true;
+      } catch (...) {}
+    }
+  }
+  return false;
+}
+
 vector<Drive> getData(const vector<string>& drives){
   vector<Drive> Data;
-
   if (drives.empty()) return Data;
 
   for (const auto& d : drives) {
-    string str = readCommand("/usr/sbin/smartctl -a " + d);
+    vector<string> lines = splitLines(readCommand("/usr/sbin/smartctl -a " + d));
 
-    // if this doesn't show smartctl -a /dev/... output then something is fucked
-    cout << str << endl;
+    Drive drive;
+    drive.dir = d;
+    getTemp(lines, tempFields, drive.temp);
 
-
-    Data.push_back({d, 0});
+    Data.push_back(drive);
   }
-
   return Data;
 }
 
