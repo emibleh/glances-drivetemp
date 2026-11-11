@@ -2,7 +2,7 @@
 
 ## use in Docker compose
 ```
-  volumes:
+    volumes:
       - /dev:/dev
     depends_on:
       - drivetemp
