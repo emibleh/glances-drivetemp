@@ -20,9 +20,10 @@ string readCommand(string cmd){
 }
 
 const vector<Field> tempFields = {
-  {"Temperature_Celsius",     9}, // SATA/SAS
-  {"Airflow_Temperature_Cel", 9}, // SATA
-  {"Temperature:",            1}, // NVMe
+  {"Temperature_Celsius",         9}, // SATA
+  {"Airflow_Temperature_Cel",     9}, // SATA alt
+  {"Temperature:",                1}, // NVMe
+  {"Current Drive Temperature:",  3},   // SAS/SCSI
 };
 
 bool sanityCheck(const string& d) {
